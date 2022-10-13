@@ -30,7 +30,7 @@ router.post("/products",productController.createProducts);
 router.get("/products/:productId",productController.getProductProfile);
 
 //----------------------get product details filter apply---------->>>>>>>>>
-router.get("/products",productController.getProductWithFilter);
+router.get("/products",productController.getProductsWithFilter);
 
 
 //-----------------------update product details---------------------->>>>>>>>>

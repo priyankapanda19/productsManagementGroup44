@@ -47,7 +47,7 @@ const createProducts = async (req, res) => {
 
         // checking duplicate title
         let duplicateTitle = await productModel.findOne({ title: title });
-        if (duplicateTitle) return res.status(400).send({ status: false, message: "title already exist in use" });
+        if (!duplicateTitle) return res.status(400).send({ status: false, message: "title already exist in use" });
 
         // checking for description
         if (!isEmpty(description)) return res.status(400).send({ status: false, message: "description required" });
@@ -76,10 +76,10 @@ const createProducts = async (req, res) => {
         if (!isEmpty(availableSizes)) return res.status(400).send({ status: false, message: "availableSizes required" });
 
         // taking size as array of string 
-        let sizesList = availableSizes.toUpperCase().split(",") 
+        let sizesList = availableSizes.toUpperCase().split(",")
         if (Array.isArray(sizesList)) {
             let arr = ["S", "XS", "M", "X", "L", "XXL", "XL"];
-            for (let i = 0; i < sizesList.length; i++) {
+            for (let i=0; i<sizesList.length; i++) {
                 if (!arr.includes(sizesList[i])) return res.status(400).send({ status: false, message: "Please Enter valid sizes, it should include only sizes from  (S,XS,M,X,L,XXL,XL) " });
                 data.availableSizes = sizesList;
             }
@@ -117,33 +117,76 @@ const createProducts = async (req, res) => {
         res.status(500).send({ status: false, error: error.message });
     }
 }
-//-----------------------Using filter get product details------------------------->>>>
-const getProductWithFilter = async function (req, res) {
-    try {
-
-        let filter = req.query
-
-        // if(Object.keys(filter).length ==0)
-
-        let { size, name, priceGreaterThan, priceLessThan } = filter
-
-        let getProduct = await productModel.find({})
-
-        console.log(filter)
-
-        res.send(getProduct)
 
 
-    } catch (err) {
-
-        res.status(500).send({ status: false, error: err.message })
 
 
+
+
+//----------------------Get Product Details --------------------------->>>>>>>>>>>
+const getProductsWithFilter = async (req, res) => {
+
+    try {// taking query
+        const queryParams = req.query;
+        // console.log(JSON.parse(queryParams))
+        const filterQueryData = { isDeleted: false };
+
+        // destructuring the data got from query
+        let { size, name, priceGreaterThan, priceLessThan, priceSort } = queryParams;
+
+        // checking if fields present then checking & adding values in query data
+        if (size) {
+            if (["S", "XS", "M", "X", "L", "XXL", "XL"].indexOf(size) == -1) return res.status(400).send({ status: false, message: 'Size should be between ["S", "XS", "M", "X", "L", "XXL", "XL"]' });
+            filterQueryData['availableSizes'] = size;
+        }
+
+        if (name) {
+            if (!isEmpty(name)) return res.status(400).send({ status: false, message: 'name is invalid' });
+            filterQueryData['title'] = name;
+        }
+
+        // all type of price filter
+        if (priceGreaterThan && priceLessThan) {
+
+            if ((!isValidNum(priceGreaterThan)) || (!isValidNum(priceLessThan))) return res.status(400).send({ status: false, message: 'please provide priceGreaterThan && priceLessThan as number' });
+            filterQueryData['price'] = { $gt: priceGreaterThan, $lt: priceLessThan };
+        }
+        if (priceGreaterThan) {
+            if (!isValidNum(priceGreaterThan)) return res.status(400).send({ status: false, message: 'please provide priceGreaterThan as number' });
+            filterQueryData['price'] = { $gt: priceGreaterThan };
+        }
+        if (priceLessThan) {
+            if (!isValidNum(priceLessThan)) return res.status(400).send({ status: false, message: 'please provide priceLessThan as number' });
+            filterQueryData['price'] = { $lt: priceLessThan };
+        }
+
+        // checking priceSort to fetch data in ascending or descending order from DB 
+        if (priceSort) {
+            if (priceSort == 1) {
+                let foundProduct = await productModel.find(filterQueryData).sort({ price: 1 });
+                if (!checkEmptyBody(foundProduct)) return res.status(404).send({ status: false, message: 'no product found' });
+                return res.status(200).send({ status: true, message: 'Success', data: foundProduct });
+            } else if (priceSort == -1) {
+                let foundProduct = await productModel.find(filterQueryData).sort({ price: -1 });
+                if (!checkEmptyBody(foundProduct)) return res.status(404).send({ status: false, message: 'no product found' });
+                return res.status(200).send({ status: true, message: 'Success', data: foundProduct });
+            } else {
+                return res.status(400).send({ status: false, message: 'please provide priceSort (1 or -1)' });
+            }
+        };
+
+        // querying in Db with filterData
+        const finalData = await productModel.find(filterQueryData);
+        if (finalData.length == 0) return res.status(404).send({ status: false, message: 'no product found' });
+        return res.status(200).send({ status: true, message: 'Success', data: finalData });
+    } catch (error) {
+        res.status(500).send({ status: false, error: error.message })
     }
-
-
-
 }
+
+
+
+
 
 
 //----------------------Get Product Details--------------------------->>>>>>>>>>>
@@ -171,6 +214,9 @@ const getProductProfile = async function (req, res) {
         res.status(500).send({ status: false, error: error.message })
     }
 }
+
+
+
 
 
 //----------------------update Product Details--------------------------->>>>>>>>>>>
@@ -229,9 +275,6 @@ const updateProduct = async function (req, res) {
             body.productImage = image;
         }
 
-
-      
-
         //checking for available Sizes of the products
         if (availableSizes) {
             if (!isEmpty(availableSizes)) return res.status(400).send({ status: false, message: "availableSizes required" });
@@ -256,15 +299,8 @@ const updateProduct = async function (req, res) {
 
                   if(sizesList[i] == dbAvailableSize[i]){
                     flag = 1
-                  }
-                  
-               
-                
+                  }         
             }
-
-            
-
-
 
         }
             // if any non mandatory fields are present in input
@@ -299,6 +335,8 @@ const updateProduct = async function (req, res) {
     }
 
 
+
+
 //----------------------delelete Product Details-------------------------->>>>>>>>
 
 const deleleteProductDetails = async function (req, res) {
@@ -323,4 +361,4 @@ const deleleteProductDetails = async function (req, res) {
     }
 
 
-    module.exports = { createProducts, getProductProfile, updateProduct, deleleteProductDetails, getProductWithFilter }
+    module.exports = { createProducts, getProductProfile, updateProduct, deleleteProductDetails, getProductsWithFilter }

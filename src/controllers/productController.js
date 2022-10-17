@@ -47,7 +47,7 @@ const createProducts = async (req, res) => {
 
         // checking duplicate title
         let duplicateTitle = await productModel.findOne({ title: title });
-        if (!duplicateTitle) return res.status(400).send({ status: false, message: "title already exist in use" });
+        if (duplicateTitle) return res.status(400).send({ status: false, message: "title already exist in use" });
 
         // checking for description
         if (!isEmpty(description)) return res.status(400).send({ status: false, message: "description required" });
@@ -66,7 +66,7 @@ const createProducts = async (req, res) => {
 
         // getting aws link for image and setting it to body data
         if (files && files.length > 0) {
-            let image = await uploadFile(files[0]);
+            let image = await uploadFile(files[0]);   // get to know line 68 to 84
             data.productImage = image;
         } else {
             return res.status(400).send({ status: false, message: "please provide the productImage" });
@@ -91,14 +91,13 @@ const createProducts = async (req, res) => {
             if (!isEmpty(style) || !isValidStyle(style)) return res.status(400).send({ status: false, message: "please enter valid style" });
         }
 
+        // if (currencyFormat) {
+        //     if (currencyFormat != '₹') return res.status(400).send({ status: false, message: "please enter valid currencyFormat" });
+        // }
 
-        if (currencyFormat) {
-            if (currencyFormat != '₹') return res.status(400).send({ status: false, message: "please enter valid currencyFormat" });
-        }
-
-        if (currencyId) {
-            if (currencyId != 'INR') return res.status(400).send({ status: false, message: "please enter valid currencyId" });
-        }
+        // if (currencyId) {
+        //     if (currencyId != 'INR') return res.status(400).send({ status: false, message: "please enter valid currencyId" });
+        // }
 
         if (isFreeShipping) {
             if (!(isFreeShipping == 'true' || isFreeShipping == 'false')) return res.status(400).send({ status: false, message: "isFreeShipping value should be only true or false " });
@@ -107,7 +106,6 @@ const createProducts = async (req, res) => {
         if (installments) {
             if (!isValidInstallments(installments)) return res.status(400).send({ status: false, message: 'please enter installments as number' });
         }
-
 
         // creating product
         const createdProduct = await productModel.create(data);
@@ -119,11 +117,8 @@ const createProducts = async (req, res) => {
 }
 
 
-
-
-
-
 //----------------------Get Product Details --------------------------->>>>>>>>>>>
+
 const getProductsWithFilter = async (req, res) => {
 
     try {// taking query
@@ -139,7 +134,6 @@ const getProductsWithFilter = async (req, res) => {
             if (["S", "XS", "M", "X", "L", "XXL", "XL"].indexOf(size) == -1) return res.status(400).send({ status: false, message: 'Size should be between ["S", "XS", "M", "X", "L", "XXL", "XL"]' });
             filterQueryData['availableSizes'] = size;
         }
-
         if (name) {
             if (!isEmpty(name)) return res.status(400).send({ status: false, message: 'name is invalid' });
             filterQueryData['title'] = name;
@@ -185,10 +179,6 @@ const getProductsWithFilter = async (req, res) => {
 }
 
 
-
-
-
-
 //----------------------Get Product Details--------------------------->>>>>>>>>>>
 
 const getProductProfile = async function (req, res) {
@@ -197,7 +187,6 @@ const getProductProfile = async function (req, res) {
         let data = req.params.productId;
 
         if (!isValidObjectId(data)) return res.status(400).send({ staus: false, message: "Please provide valid ProductId" })
-
 
         let getProduct = await productModel.findById({ _id: data })
 
@@ -214,9 +203,6 @@ const getProductProfile = async function (req, res) {
         res.status(500).send({ status: false, error: error.message })
     }
 }
-
-
-
 
 
 //----------------------update Product Details--------------------------->>>>>>>>>>>
@@ -304,7 +290,6 @@ const updateProduct = async function (req, res) {
                         console.log(index)
                     }
                 }
-
                 console.log(db, sizesList)
                 availableSizes = db
             }
@@ -314,20 +299,15 @@ const updateProduct = async function (req, res) {
         if (style) {
             if (!isEmpty(style) || !isValidStyle(style)) return res.status(400).send({ status: false, message: "please enter valid style" });
         }
-
-
         if (currencyFormat) {
             if (currencyFormat != '₹') return res.status(400).send({ status: false, message: "please enter valid currencyFormat" });
         }
-
         if (currencyId) {
             if (currencyId != 'INR') return res.status(400).send({ status: false, message: "please enter valid currencyId" });
         }
-
         if (isFreeShipping) {
             if (!(isFreeShipping == 'true' || isFreeShipping == 'false')) return res.status(400).send({ status: false, message: "isFreeShipping value should be only true or false " });
         }
-
         if (installments) {
             if (!isValidInstallments(installments)) return res.status(400).send({ status: false, message: 'please enter installments as number' });
         }
@@ -339,8 +319,6 @@ const updateProduct = async function (req, res) {
         return res.status(500).send({ status: false, error: err.message })
     }
 }
-
-
 
 
 //----------------------delelete Product Details-------------------------->>>>>>>>

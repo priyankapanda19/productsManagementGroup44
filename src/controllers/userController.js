@@ -74,7 +74,6 @@ const createUser = async function (req, res) {
         
         if (Object.keys(address).length == 0) return res.status(400).send({ status: false, message: "please enter a valid address" })
         
-
         if (!address.shipping) return res.status(400).send({ status: false, message: "please enter shipping address and it should be in object also." })
         else {
 
@@ -100,7 +99,6 @@ const createUser = async function (req, res) {
 
         if (!isEmpty(city)) return res.status(400).send({ status: false, message: "Please enter Billing City Name" })
         if (!cityValidation(city.trim())) return res.status(400).send({ status: false, message: "provide a Billing City Name" })
-
 
         if (!isEmpty(pincode)) return res.status(400).send({ status: false, message: "Enter Billing Pincode" })
         if (!pincodeValidation(pincode)) return res.status(400).send({ status: false, message: "provide a valid pincode" })
@@ -160,8 +158,6 @@ const loginUser = async function (req, res) {
 
         res.header('Authorization', token);
         return res.status(201).send({ status: true, message: 'Success', data: { userId: `${findUser._id}`, token: token } });
-
-
     }
     catch (error) {
         res.status(500).send({ status: false, error: error.message })
@@ -186,7 +182,6 @@ const getUserProfile = async function (req, res) {
         //  let {fname, lname, email, profileImage, phone, password, address} = getUserData
      
          return res.status(200).send({ status: true, message: 'User profile details successfully fetch', data:getUserData, });
-
     }
     catch (error) {
         res.status(500).send({ status: false, error: error.message })
@@ -223,7 +218,6 @@ const updateUserProfile = async function (req, res) {
         }
         let add = findUser.address
 
-
         // if (Object.keys(address).length == 0) return res.status(400).send({ status: false, message: "please Provide address Fields,its Totally blank" })
 
         if (address) {
@@ -239,8 +233,6 @@ const updateUserProfile = async function (req, res) {
             if (address.billing == "") {
                 return res.status(400).send({ status: false, message: "please enter billing address to update" })
             }
-        
-
             if (address.shipping) {
                 if (typeof (address.shipping) != "object") {
                     return res.status(400).send({ status: false, message: "please enter shpping address in valid format to update" })
@@ -254,8 +246,6 @@ const updateUserProfile = async function (req, res) {
                 if (address.shipping.pincode) {
                     add.shipping.pincode = address.shipping.pincode
                 }
-
-
             }
             if (address.billing) {
                 if (typeof (address.billing) != "object") {
@@ -270,14 +260,11 @@ const updateUserProfile = async function (req, res) {
                 if (address.billing.pincode) {
                     add.billing.pincode = address.billing.pincode
                 }
-            }
-        
+            }        
         }
         
-
         // if (!isEmpty(fname)) return res.status(400).send({ status: false, message: "fname is Mandatory,Please provide some input" });
         if (fname&&!isValidName(fname)) return res.status(400).send({ status: false, message: "fname is Not valid" });
-
 
         // if (!isEmpty(lname)) return res.status(400).send({ status: false, message: "lname is Mandatory,Please Provide some input" })
         if (lname&&!isValidName(lname)) return res.status(400).send({ status: false, message: "lname is Not valid" })
@@ -290,32 +277,20 @@ const updateUserProfile = async function (req, res) {
                 return res.status(400).send({ status: false, message: "email to update is already In Database,please give some unique email id." })
             }
         
-
     // if (!isEmpty(phone)) return res.status(400).send({ status: false, message: "phone is Mandatory" })
     if (phone&&!isValidPhone(phone)) return res.status(400).send({ status: false, message: "phone is Not  valid,please provide unique phone no" })
 
-    
             let uniquePhone = await userModel.findOne({ phone: phone })
             if (uniquePhone) {
                 return res.status(400).send({ status: false, message: "phone already exist " })
             }
-
             if(password && !isValidPassword) return res.status(400).send({ status: false, message: "Password is not valid" })
-
-        if (password && isValidPassword) {
-
-            var pass = await passEncryption(password)
-            
+            if (password && isValidPassword) {
+            var pass = await passEncryption(password)           
         }
 
-
-
         let update = await userModel.findByIdAndUpdate({ _id: userId }, { $set: { fname: fname, lname: lname, email: email, phone: phone, password: pass, address: add, image: profileImage  } }, { new: true })
-
         return res.status(200).send({ status: true, message: "User profile updated", data: update })
-
-
-
     }
     catch (error) {
         res.status(500).send({ status: false, error: error.message })

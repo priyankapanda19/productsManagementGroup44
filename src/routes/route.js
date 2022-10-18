@@ -2,6 +2,8 @@ const express= require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
 const productController = require("../controllers/productController");
+const cartController = require("../controllers/cartController");
+const orderController = require("../controllers/orderController");
 const mw = require("../middleware/auth")
 
 
@@ -40,6 +42,29 @@ router.put("/products/:productId",productController.updateProduct);
 router.delete("/products/:productId", productController.deleleteProductDetails);
 
 
+//-----------------------cart Api's-3---------------------------->>>>>>>>>>>
+
+//-----------------------create product details---------------------->>>>>>>>>
+router.post("/users/:userId/cart", cartController.createCartdetails);
+
+//-----------------------update product details---------------------->>>>>>>>>
+router.put("/users/:userId/cart", cartController.updateCart);
+
+//-----------------------get product details---------------------->>>>>>>>>
+router.get("/users/:userId/cart", cartController.getCart);
+
+//-----------------------delete product details---------------------->>>>>>>>>
+router.delete("/users/:userId/cart", cartController.deleteCart);
+
+
+
+//-----------------------order Api's-4---------------------------->>>>>>>>>>>
+
+//----------------------create order--------------------------->>>>>>>>>>>
+router.post("/users/:userId/orders", orderController.createOrder);
+
+//----------------------update order--------------------------->>>>>>>>>>>
+router.put("/users/:userId/orders", orderController.updateOrder);
 
 
 router.all('/*',async function(req,res){

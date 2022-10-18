@@ -45,26 +45,26 @@ router.delete("/products/:productId", productController.deleleteProductDetails);
 //-----------------------cart Api's-3---------------------------->>>>>>>>>>>
 
 //-----------------------create product details---------------------->>>>>>>>>
-router.post("/users/:userId/cart", cartController.createCartdetails);
+router.post("/users/:userId/cart",mw.Authentication, mw.Authorization, cartController.createCartdetails);
 
 //-----------------------update product details---------------------->>>>>>>>>
-router.put("/users/:userId/cart", cartController.updateCart);
+router.put("/users/:userId/cart",mw.Authentication,cartController.updateCart);
 
 //-----------------------get product details---------------------->>>>>>>>>
-router.get("/users/:userId/cart", cartController.getCart);
+router.get("/users/:userId/cart",mw.Authentication, cartController.getCart);
 
 //-----------------------delete product details---------------------->>>>>>>>>
-router.delete("/users/:userId/cart", cartController.deleteCart);
+router.delete("/users/:userId/cart",mw.Authentication, mw.Authorization, cartController.deleteCart);
 
 
 
 //-----------------------order Api's-4---------------------------->>>>>>>>>>>
 
 //----------------------create order--------------------------->>>>>>>>>>>
-router.post("/users/:userId/orders", orderController.createOrder);
+router.post("/users/:userId/orders",mw.Authentication, mw.Authorization, orderController.createOrder);
 
 //----------------------update order--------------------------->>>>>>>>>>>
-router.put("/users/:userId/orders", orderController.updateOrder);
+router.put("/users/:userId/orders",mw.Authentication, orderController.updateOrder);
 
 
 router.all('/*',async function(req,res){

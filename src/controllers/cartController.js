@@ -4,7 +4,8 @@ const productModel = require("../models/productModel");
 // const ObjectId = mongoose.Schema.Types.ObjectId
 
 
-const { isValidObjectId } = require("../validation/validation");
+const { isValidObjectId ,checkEmptyBody,isEmpty
+} = require("../validation/validation");
 
 //----------------------create cart--------------------------->>>>>>>>>>>
 
@@ -102,10 +103,10 @@ const updateCart = async (req, res) => {
     const { cartId, productId, removeProduct } = bodyData;
 
     // checking and validating fields
-    if (!isValid(cartId)) return res.status(400).send({ status: false, msg: "cartId is required." });
+    if (!isEmpty(cartId)) return res.status(400).send({ status: false, msg: "cartId is required." });
     if (!isValidObjectId(cartId)) return res.status(400).send({ status: false, msg: `cartId: ${cartId}, is invalid.` });
 
-    if (!isValid(productId)) return res.status(400).send({ status: false, msg: "productId is required.." });
+    if (!isEmpty(productId)) return res.status(400).send({ status: false, msg: "productId is required.." });
     if (!isValidObjectId(productId)) return res.status(400).send({ status: false, msg: `productId: ${productId}, is invalid.` });
 
     // searching data in cart collection
@@ -140,7 +141,7 @@ const updateCart = async (req, res) => {
               { _id: cartId },
               {
                 $pull: { items: { productId: productId } },
-                totalPrice: cartSearch.totalPrice - priceChange, totalItems: cartSearch.totalItems - 1
+                totalPrice: searchCart.totalPrice - priceChange, totalItems: searchCart.totalItems - 1
               },
               { new: true }
             );
@@ -150,7 +151,7 @@ const updateCart = async (req, res) => {
           cart[i].quantity = cart[i].quantity - 1;
           const updatedCart = await cartModel.findByIdAndUpdate(
             { _id: cartId },
-            { items: cart, totalPrice: cartSearch.totalPrice - productSearch.price },
+            { items: cart, totalPrice: searchCart.totalPrice - searchProduct.price },
             { new: true }
           );
           return res.status(200).send({ status: true, message: 'Success', data: updatedCart });
@@ -182,7 +183,7 @@ const getCart = async function (req, res) {
     }
 
     //authorization
-    if (req.decodedToken != userId)
+    if (req.userId != userId)
       return res.status(403).send({ status: false, message: "You are not an Authorized Person" });
 
     let getData = await cartModel.findOne({ userId });
@@ -218,17 +219,17 @@ const deleteCart = async function (req, res) {
     }
 
     // AUTHORISATION
-    if (req.decodedToken != userId)
+    if (req.userId != userId)
       return res.status(403).send({ status: false, message: "You are not an authorized Person" })
 
     // To check cart is present or not
-    const cartSearch = await cartModel.findOne({ userId })
-    if (!cartSearch) {
+    const searchCart = await cartModel.findOne({ userId })
+    if (!searchCart) {
       return res.status(404).send({ status: false, message: "Cart details are not found " })
     }
 
     const cartDelete = await cartModel.findOneAndUpdate({ userId }, { $set: { items: [], totalItems: 0, totalPrice: 0 } }, { new: true })
-    return res.status(204).send({ status: true, message: 'Success', data: "Cart is deleted successfully" })
+    return res.status(204).send({ status: true})
 
   }
   catch (error) {

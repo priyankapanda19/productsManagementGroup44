@@ -150,7 +150,7 @@ const loginUser = async function (req, res) {
         let payLoad = {
             userId: findUser._id.toString(),
             iat: issuingTime,
-            exp: issuingTime + 6000 // 100 minutes
+            // exp: issuingTime + 6000 // 100 minutes
         }
 
         // creating token

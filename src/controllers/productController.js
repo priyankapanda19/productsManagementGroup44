@@ -220,7 +220,9 @@ const updateProduct = async function (req, res) {
 
         let body = req.body
 
-        if (!checkEmptyBody(body)) return res.status(400).send({ status: false, message: "plz enter the field which you want to update" })
+        let files = (req.files)
+
+        if (!checkEmptyBody(body) && (files.length == 0)) return res.status(400).send({ status: false, message: "plz enter the field which you want to update" })
 
         // destructuring fields from data
         let { title, description, price, currencyId, currencyFormat, productImage, availableSizes, installments, style, isFreeShipping } = body;
@@ -241,7 +243,7 @@ const updateProduct = async function (req, res) {
         if (price) {
             if (!isEmpty(price)) return res.status(400).send({ status: false, message: "price required" });
             if (!isValidPrice(price)) return res.status(400).send({ status: false, message: "Invalid price" });
-        }
+        }  
 
         // checking currencyId
         if (currencyId) {
@@ -255,10 +257,11 @@ const updateProduct = async function (req, res) {
             if (currencyFormat != '₹') return res.status(400).send({ status: false, message: "only indian currency ₹ accepted " });
         }
         // getting aws link for image and setting it to body data
-        let files = req.files
+        // let files = req.files
         if (files && files.length > 0) {
             let image = await uploadFile(files[0]);
-            body.productImage = image;
+            // body.productImage = image;
+            productImage = image
         }
 
         //checking for available Sizes of the products

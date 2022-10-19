@@ -27,6 +27,9 @@ const createCartdetails = async function (req, res) {
     if (!isValidObjectId(productId)) return res.status(400).send({ status: false, message: "please enter valid product id" })
     let checkProduct = await productModel.findOne({ isDeleted: false, _id: productId })
     if (!checkProduct) return res.status(404).send({ status: false, message: "product not found" })
+    productObj.title = checkProduct.title
+    productObj.price = checkProduct.price
+    productObj.productImage = checkProduct.productImage
     let productPrice = checkProduct.price
 
     if (cartId) {
@@ -67,7 +70,7 @@ const createCartdetails = async function (req, res) {
       totalPrice: productPrice
     }
 
-    let savedData = await cartModel.create(createCartObject)
+    let savedData = await cartModel.create(createCartObject)//.select({_id:0})
 
     return res.status(201).send({ status: true, message: "Success", data: savedData })
   } catch (err) {

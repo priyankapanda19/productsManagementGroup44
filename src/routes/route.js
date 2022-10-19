@@ -39,7 +39,7 @@ router.get("/products",productController.getProductsWithFilter);
 router.put("/products/:productId",productController.updateProduct);
 
 //-----------------------delete product details---------------------->>>>>>>>>
-router.delete("/products/:productId", productController.deleleteProductDetails);
+router.delete("/products/:productId", productController.deleteProductDetails);
 
 
 //-----------------------cart Api's-3---------------------------->>>>>>>>>>>

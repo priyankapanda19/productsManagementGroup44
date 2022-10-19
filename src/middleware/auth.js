@@ -8,7 +8,7 @@ const Authentication = async (req, res, next) => {
     try {
         // accessing token from headers
         let token = req.headers.authorization;
-        if (!token) return res.status(400).send({ status: false, message: 'TOKEN is missing !!!' });
+        if (!token) return res.status(401).send({ status: false, message: 'TOKEN is missing !!!' });
 
         // console.log({ token: token })
 

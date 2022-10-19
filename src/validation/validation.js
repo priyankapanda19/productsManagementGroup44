@@ -48,10 +48,10 @@ const isValidName = function (name) {
   return nameRegex.test(name);
 };
 //<<----------------Validation for Phone No. ---------------->>
-const isValidPhone = function (phone) {
-  return /^([+]\d{2})?\d{10}$/.test(phone);
-};
 
+const isValidPhone = function (phone) {
+  return /^((\+91)?|91)?[6789][0-9]{9}$/.test(phone);
+};
 
 
 //------------------ Password Validation----------------------->>

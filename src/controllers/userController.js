@@ -50,7 +50,7 @@ const createUser = async function (req, res) {
 
         // if(!profileImage) return res.status(400).send({status: false, message: "profileImage is required"})
         let files = req.files;
-        if (!files || files.length == 0) return res.status(400).send({ status: false, message: "please provide file" })
+        if (!files || files.length == 0) return res.status(400).send({ status: false, message: "please provide Profile Image file" })
         let imageUrl = await uploadFile(files[0])
         body.profileImage = imageUrl;
     

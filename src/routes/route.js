@@ -1,3 +1,4 @@
+//-----------------------      Importing required modules and packages       ----------------------------//
 const express= require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
@@ -7,67 +8,52 @@ const orderController = require("../controllers/orderController");
 const mw = require("../middleware/auth")
 
 
-//-----------------------user Api's-1---------------------------->>>>>>>>>>>
+//-----------------------       user Api's-1       ---------------------------->>>>>>>>>>>
+router.post("/register", userController.createUser);                                                            
 
-//-----------------------user creation---------------------->>>>>>>>>
-router.post("/register", userController.createUser);
+router.post("/login", userController.loginUser);                                                                //>>>>>>>>>> post api (user Login)
 
-//-----------------------post api (user Login)------------------------>>>>>>>>>>
-router.post("/login", userController.loginUser);
+router.get("/user/:userId/profile",mw.Authentication, userController.getUserProfile);                           //>>>>>>>>>>>>> Get User Profile
 
-//---------------------Get User Profile-------------------->>>>>>>>>>>>>
-router.get("/user/:userId/profile",mw.Authentication, userController.getUserProfile);
-
-//-----------------------user Profile update----------------------------->>>>>>>>>>>
-router.put("/user/:userId/profile",mw.Authentication, mw.Authorization, userController.updateUserProfile);
+router.put("/user/:userId/profile",mw.Authentication, mw.Authorization, userController.updateUserProfile);      //>>>>>>>>>>> user Profile update
 
 
 
-//-----------------------product Api's-2---------------------------->>>>>>>>>>>
+//-----------------------       product Api's-2        ---------------------------->>>>>>>>>>>
+router.post("/products",productController.createProducts);                                                      //>>>>>>>>> create product details
 
-//-----------------------create product details---------------------->>>>>>>>>
-router.post("/products",productController.createProducts);
+router.get("/products/:productId",productController.getProductProfile);                                         //>>>>>>>>> get product details
 
-//-----------------------get product details---------------------->>>>>>>>>
-router.get("/products/:productId",productController.getProductProfile);
+router.get("/products",productController.getProductsWithFilter);                                                //>>>>>>>>> get product details filter apply
 
-//----------------------get product details filter apply---------->>>>>>>>>
-router.get("/products",productController.getProductsWithFilter);
+router.put("/products/:productId",productController.updateProduct);                                             //>>>>>>>>> update product details
 
-
-//-----------------------update product details---------------------->>>>>>>>>
-router.put("/products/:productId",productController.updateProduct);
-
-//-----------------------delete product details---------------------->>>>>>>>>
-router.delete("/products/:productId", productController.deleteProductDetails);
-
-
-//-----------------------cart Api's-3---------------------------->>>>>>>>>>>
-
-//-----------------------create product details---------------------->>>>>>>>>
-router.post("/users/:userId/cart",mw.Authentication, mw.Authorization, cartController.createCartdetails);
-
-//-----------------------update product details---------------------->>>>>>>>>
-router.put("/users/:userId/cart",mw.Authentication,cartController.updateCart);
-
-//-----------------------get product details---------------------->>>>>>>>>
-router.get("/users/:userId/cart",mw.Authentication, cartController.getCart);
-
-//-----------------------delete product details---------------------->>>>>>>>>
-router.delete("/users/:userId/cart",mw.Authentication, mw.Authorization, cartController.deleteCart);
+router.delete("/products/:productId", productController.deleteProductDetails);                                  //>>>>>>>>> delete product details
 
 
 
-//-----------------------order Api's-4---------------------------->>>>>>>>>>>
+//-----------------------       cart Api's-3        ---------------------------->>>>>>>>>>>
+router.post("/users/:userId/cart",mw.Authentication, cartController.createCartDetails);       //>>>>>>>>> create product details
 
-//----------------------create order--------------------------->>>>>>>>>>>
-router.post("/users/:userId/orders",mw.Authentication, mw.Authorization, orderController.createOrder);
+router.put("/users/:userId/cart",mw.Authentication,cartController.updateCart);                                  //>>>>>>>>> update product details
 
-//----------------------update order--------------------------->>>>>>>>>>>
-router.put("/users/:userId/orders",mw.Authentication, orderController.updateOrder);
+router.get("/users/:userId/cart",mw.Authentication, cartController.getCart);                                    //>>>>>>>>> get product details
+
+router.delete("/users/:userId/cart",mw.Authentication, cartController.deleteCart);            //>>>>>>>>> delete product details
 
 
+
+//-----------------------       order Api's-4        ---------------------------->>>>>>>>>>>
+router.post("/users/:userId/orders",mw.Authentication, orderController.createOrder);          //>>>>>>>>> create order
+
+router.put("/users/:userId/orders",mw.Authentication, orderController.updateOrder);                             //>>>>>>>>> update order
+
+
+
+//-----------------------       limiting url path        ---------------------------->>>>>>>>>>>
 router.all('/*',async function(req,res){
     return res.status(404).send({status:false,message:"Page Not Found"});
 })
+
+// exporting router
 module.exports= router;

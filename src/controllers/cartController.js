@@ -10,7 +10,7 @@ const { isValidObjectId ,checkEmptyBody,isEmpty
 //----------------------create cart--------------------------->>>>>>>>>>>
 
 
-const createCartdetails = async function (req, res) {
+const createCartDetails = async function (req, res) {
   try {
     let { cartId, productId } = req.body
     let userId = req.params.userId
@@ -160,8 +160,9 @@ const updateCart = async (req, res) => {
           return res.status(200).send({ status: true, message: 'Success', data: updatedCart });
         }
       }
-      return res.status(400).send({ status: false, message: "Product does not found in the cart" });
     }
+      return res.status(404).send({ status: false, message: "Product does not exist in Cart" });
+    
   } catch (error) {
     console.log(error);
     res.status(500).send({ msg: "Error", error: error.message });
@@ -170,10 +171,10 @@ const updateCart = async (req, res) => {
 
 
 //----------------------get cart--------------------------->>>>>>>>>>>
-
-const getCart = async function (req, res) {
+const getCart = async (req, res) => {
   try {
-    let userId = req.params.userId
+    let userId = req.params.userId;
+    userId = userId.trim();
 
     // validation for userId
     if (!isValidObjectId(userId)) {
@@ -182,22 +183,21 @@ const getCart = async function (req, res) {
 
     let checkUserId = await userModel.findOne({ _id: userId })
     if (!checkUserId) {
-      return res.status(404).send({ status: false, message: `User details are not found with this userId ${userId}` })
+      return res.status(404).send({ status: false, message: `no user details found with this userId ${userId}.` })
     }
 
     //authorization
     if (req.userId != userId)
       return res.status(403).send({ status: false, message: "You are not an Authorized Person" });
 
-    let getData = await cartModel.findOne({ userId });
-    if (getData.items.length == 0)
-      return res.status(400).send({ status: false, message: "Items Is empty " });
+    let getCartData = await cartModel.findOne({ userId });
+    // if (getCartData.items.length == 0) return res.status(400).send({ status: false, message: "Items Is empty " });
 
-    if (!getData) {
+    if (!getCartData) {
       return res.status(404).send({ status: false, message: `Cart does not Exist with this userId :${userId}` })
     }
 
-    res.status(200).send({ status: true, message: 'Success', data: getData })
+    res.status(200).send({ status: true, message: 'Success', data: getCartData })
 
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
@@ -211,6 +211,8 @@ const deleteCart = async function (req, res) {
 
     // Validate params
     userId = req.params.userId
+    userId = userId.trim();
+
     if (!isValidObjectId(userId)) {
       return res.status(400).send({ status: false, message: `The given userId: ${userId} is not in proper format` })
     }
@@ -221,7 +223,7 @@ const deleteCart = async function (req, res) {
       return res.status(404).send({ status: false, message: `User details are not found with this userId ${userId}` })
     }
 
-    // AUTHORISATION
+    // Authorization
     if (req.userId != userId)
       return res.status(403).send({ status: false, message: "You are not an authorized Person" })
 
@@ -231,12 +233,20 @@ const deleteCart = async function (req, res) {
       return res.status(404).send({ status: false, message: "Cart details are not found " })
     }
 
-    const cartDelete = await cartModel.findOneAndUpdate({ userId }, { $set: { items: [], totalItems: 0, totalPrice: 0 } }, { new: true })
-    return res.status(204).send({ status: true})
+    if (searchCart.totalPrice == 0 && searchCart.totalItems == 0 && searchCart.items.length == 0) return res.status(404).send({ status: false, message: "cart already empty!!" });
+
+
+    const cartDelete = await cartModel.findOneAndUpdate(
+      { userId },
+      { $set: { items: [], totalItems: 0, totalPrice: 0 } },
+      { new: true }
+    );
+
+    return res.status(204).send({ status: true, message: 'deleted', data: cartDelete });
 
   }
   catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
 }
-module.exports = { createCartdetails, updateCart, getCart, deleteCart }
+module.exports = { createCartDetails, updateCart, getCart, deleteCart }

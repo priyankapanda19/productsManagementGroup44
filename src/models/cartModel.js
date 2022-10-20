@@ -15,9 +15,7 @@ const cartSchema = new mongoose.Schema({
             refs: "Product",
             required: true
         },
-        title:String,
-        price:Number,
-        productImage:String,
+        
         quantity:{
             type: Number,
             required: true
@@ -35,3 +33,11 @@ const cartSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 module.exports = mongoose.model("Cart", cartSchema)
+
+
+
+
+
+// title:String,
+//         price:Number,
+//         productImage:String,

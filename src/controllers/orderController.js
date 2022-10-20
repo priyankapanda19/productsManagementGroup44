@@ -24,7 +24,7 @@ const createOrder = async function (req, res) {
 
             let isPresentCart = await cartModel.findById(cartIdFromBody)
 
-            if(!isPresentCart)  return res.status(400).send({ status: false, message: "cartId is not presnt in DB .." })
+            if(!isPresentCart)  return res.status(400).send({ status: false, message: "cartId is not presnt in DB .." }) // 404
 
             if(cartIdFromBody != cartData._id) return res.status(400).send({ status: false, message: "credetial are incorrect" })
         }
@@ -74,7 +74,7 @@ const updateOrder = async function (req, res) {
         // if(!(body.status == pending || body.status == completed || body.status == cancled ) )
         // return res.status(400).send({ status: false, message: "status invalid" })
 
-        if (["pending", "completed", "cancled"].indexOf(body.status) == -1)
+        if ([ "completed", "cancled"].indexOf(body.status) == -1)
             return res.status(400).send({ status: false, message: "status invalid" })
 
         let orderId = body.orderId
@@ -88,6 +88,8 @@ const updateOrder = async function (req, res) {
         if(!order) return res.status(404).send({ status: false, message: "order is not exist" })
 
         if (order.userId != userId) return res.status(403).send({ status: false, message: "order does not belong to user" })
+
+        if(order.status == 'cancel')
 
         // if (order.cancellable != true) return res.status(403).send({ status: false, message: "this is not cancellable item" })
 

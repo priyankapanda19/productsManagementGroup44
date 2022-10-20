@@ -289,7 +289,7 @@ const updateUserProfile = async function (req, res) {
             var pass = await passEncryption(password)           
         }
 
-        let update = await userModel.findByIdAndUpdate({ _id: userId }, { $set: { fname: fname, lname: lname, email: email, phone: phone, password: pass, address: add, image: profileImage  } }, { new: true })
+        let update = await userModel.findByIdAndUpdate({ _id: userId }, { $set: { fname: fname, lname: lname, email: email, phone: phone, password: pass, address: add, profileImage: profileImage  } }, { new: true })
         return res.status(200).send({ status: true, message: "User profile updated", data: update })
     }
     catch (error) {
